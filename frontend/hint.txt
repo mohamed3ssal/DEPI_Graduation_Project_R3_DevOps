@@ -1,0 +1,31 @@
+the app-config does not uploaded to the container that will build the image it is created by
+ a script during the container running here a docker file show the case
+ 
+ [root@localhost Front]# cat Dockerfile
+
+FROM nginx:latest
+WORKDIR /usr/share/nginx/html/
+COPY . .
+RUN chmod -R +r *
+RUN apt-get update -y && apt-get install vim iputils-ping -y
+COPY ./entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+EXPOSE 80
+ENTRYPOINT ["/entrypoint.sh"]
+
+
+[root@localhost Front]#
+[root@localhost Front]#
+[root@localhost Front]# cat entrypoint.sh
+#!/bin/bash
+
+cat <<EOT > /usr/share/nginx/html/js/app-config.js
+window.backhost = {
+host: "${BACK_HOST}"        #hint : the BACK_HOST is the var you pass to the container during running with -e BACK_HOST=backend_ip or hostname
+}
+EOT
+
+nginx -g "daemon off;"
+
+[root@localhost Front]#
+[root@localhost Front]#
