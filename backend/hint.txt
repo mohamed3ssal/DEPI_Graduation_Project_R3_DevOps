@@ -1,0 +1,4 @@
+the enviromental variable that the backend need is 
+DATABASE_URL="the link to the database"
+HOST = "the backend container host name or ip address"
+PORT = 7000 "the port for the backend end keep it 7000 "
