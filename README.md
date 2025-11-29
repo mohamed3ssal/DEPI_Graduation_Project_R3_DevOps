@@ -1,192 +1,254 @@
-# DEPI Graduation Project — R3 DevOps
+# DevOps Engineer — Monitoring a Containerized URL Shortener Webservice
 
-هذا المشروع يجمع بين Backend (Node.js)، Frontend، ونظام مراقبة متكامل (Prometheus + Node Exporter + Grafana) بالإضافة إلى Alertmanager. يهدف المشروع إلى توفير بنية قابلة للتشغيل محليًا أو على الخوادم باستخدام Docker Compose.
+This README is tailored specifically for the required graduation DevOps project. It reflects **your actual implementation**, where:
 
----
+* **Prometheus, Grafana, and Node Exporter run directly on the Host (non-Docker)**
+* **cAdvisor runs as a Docker container**
+* **Custom Prometheus metrics are implemented inside the Backend Node.js code**
+* **Backend + Frontend + Mongo DB run on Docker**
 
-## 🎯 نظرة عامة
-
-المشروع يحتوي على:
-
-* Backend Node.js
-* Frontend
-* Prometheus لمراقبة المقاييس
-* Node Exporter لمراقبة الموارد
-* Grafana للـ Dashboards
-* Alertmanager للتنبيهات
+This document provides a full professional overview of the project, its weekly deliverables, architecture, monitoring setup, and API documentation.
 
 ---
 
-## 🗂️ هيكل المشروع
+# 📌 Project Overview
+
+A complete DevOps project that builds, containerizes, and monitors a fully functional **URL Shortener Webservice**.
+
+The project includes:
+
+* A Dockerized URL Shortener Application (Backend + Frontend)
+* Custom Prometheus Metrics
+* Full Monitoring Stack (Prometheus, cAdvisor, Grafana)
+* Alerting using Alertmanager
+* Host-based metrics and dashboards
+
+The goal is to produce a **production-like monitoring environment** running locally.
+
+---
+
+# 🗂️ Project Structure
 
 ```
 DEPI_Graduation_Project_R3_DevOps/
 │
-├── backend/
+├── backend/                 # Node.js URL Shortener + Custom Metrics
 │   ├── Dockerfile
 │   ├── package.json
 │   └── src/
 │
-├── frontend/
+├── frontend/                # Web UI (React or similar)
 │   ├── Dockerfile
 │   └── src/
 │
-├── prometheus/
-│   ├── prometheus.yml
-│   └── alerting.rules.yml
+├── prometheus/              # Prometheus configs (Host-based)
+│   └── prometheus.yml
+│   
 │
-├── alertmanager/
+├── alertmanager/            # Alertmanager configs
 │   ├── alertmanager.yml
+│   ├── alerting.rules.yml
 │   └── templates/
 │
-├── grafana/
+├── grafana/                 # Provisioning for Host Grafana
 │   └── provisioning/
 │       ├── datasources/
 │       │   └── datasource.yml
 │       └── dashboards/
-│           └── dashboard.json
+│           └── urlshortener-dashboard.json
 │
-└── docker-compose.yml
+├── docker-compose.yml       # Runs backend, frontend, cAdvisor
+│
+└── README.md
 ```
 
 ---
 
-## 🚀 طريقة التشغيل
+# 🧪 Week 1 — Build & Containerize the URL Shortener
 
-### 1️⃣ استنساخ المشروع
+## ✅ Work Completed
 
+* Developed URL Shortener API using **Node.js (Express)**.
+* Implemented two main endpoints:
+
+  * `POST /shorten` — Accepts long URL, returns short code
+  * `GET /:code` — Redirects to long URL
+* Added **SQLite database** for local storage.
+* Created **Dockerfile** for backend and frontend.
+* Wrote initial **docker-compose.yml** including:
+
+  * backend (container)
+  * frontend (container)
+  * cAdvisor (container)
+
+## 📦 Deliverables
+
+✔ Fully functional URL Shortener
+✔ Backend + Frontend Dockerized
+✔ docker-compose.yml running containers successfully
+✔ Redirect workflow tested and working
+
+---
+
+# 📈 Week 2 — Instrumenting with Custom Prometheus Metrics
+
+## 🎯 Work Completed
+
+Custom Prometheus metrics implemented using `prom-client` inside the backend:
+
+* **Counter** → Number of URLs shortened
+* **Counter** → Number of successful redirects
+* **Counter** → Failed lookups (404)
+* **Histogram** → Latency for `/shorten` requests
+* **Histogram** → Latency for redirects
+
+## 🔧 Prometheus Setup (Host-based)
+
+Prometheus runs directly on the host and scrapes:
+
+* Backend metrics → `http://<host-ip>:3000/metrics`
+* Node Exporter (host machine metrics)
+* cAdvisor (container performance)
+
+## 📦 Deliverables
+
+✔ `/metrics` endpoint exposed
+✔ Prometheus scraping all metrics
+✔ cAdvisor integrated into scrape configs
+✔ Metrics visible in Prometheus UI
+
+---
+
+# 📊 Week 3 — Grafana Dashboard & Visualization
+
+## 🎯 Work Completed
+
+* Grafana running on the host (system service)
+* Connected Grafana to Prometheus using provisioning
+* Built a **custom dashboard** visualizing:
+
+  * URL creation rate
+  * Redirect rate
+  * Total shortened URLs (stat panel)
+  * 95th percentile request latency
+  * 404 error rate
+  * cAdvisor container metrics (CPU, Memory, Health)
+
+## 📦 Deliverables
+
+✔ Grafana integrated with Prometheus
+✔ Professional dashboard created
+✔ All custom metrics visualized in real time
+
+---
+
+# 🚨 Week 4 — Alerting, Persistence & Final Documentation
+
+## 🎯 Work Completed
+
+* Setup Alertmanager on the host
+* Added meaningful alerts:
+
+  * High 404 error rate
+  * High latency
+  * Backend down alerts
+* Enabled persistent storage:
+
+  * SQLite DB stored on host
+  * Prometheus data stored under `/var/lib/prometheus`
+  * Grafana data stored under `/var/lib/grafana`
+* Performed complete restart tests:
+
+  ```bash
+  docker compose down
+  docker compose up -d
+  systemctl restart prometheus
+  ```
+
+e systemctl restart grafana-server
+
+````
+- Verified data persisted successfully
+- Completed full documentation (API + system overview)
+
+## 📦 Deliverables
+✔ Alerting configured  
+✔ Persistence enabled for all stateful services  
+✔ Stable monitoring stack after restart  
+✔ Completed and professional documentation
+
+---
+
+# 📘 API Documentation
+## POST /shorten
+Creates a shortened URL.
+
+**Request Body:**
+```json
+{
+"url": "https://example.com"
+}
+````
+
+**Response:**
+
+```json
+{
+  "shortCode": "abc123"
+}
 ```
-git clone https://github.com/mohamed3ssal/DEPI_Graduation_Project_R3_DevOps.git
-cd DEPI_Graduation_Project_R3_DevOps
+
+---
+
+## GET /:code
+
+Redirects user to the original long URL.
+
+**Responses:**
+
+* HTTP **302 Redirect**, or:
+
+```json
+{
+  "error": "Not Found"
+}
 ```
 
-### 2️⃣ تشغيل المشروع باستخدام Docker Compose
+---
 
+# 🚀 Running the Entire Stack
+
+## 1️⃣ Start Prometheus (Host)
+
+```bash
+sudo systemctl start prometheus
 ```
+
+Or:
+
+```bash
+prometheus --config.file=/etc/prometheus/prometheus.yml
+```
+
+## 2️⃣ Start Grafana (Host)
+
+```bash
+sudo systemctl start grafana-server
+```
+
+## 3️⃣ Start Backend + Frontend + cAdvisor (Docker)
+
+```bash
 docker compose up --build -d
 ```
 
-### 3️⃣ التحقق من الحاويات
+---
 
-```
-docker ps
-```
+# 📞 Contact
+
+**Mohamed El-Sayed**
+Email: **[mohamedassal52003@gmail.com](mailto:mohamedassal52003@gmail.com)**
 
 ---
 
-## 🔧 أماكن الخدمات
-
-* Backend → [http://localhost:3000](http://localhost:3000)
-* Frontend → [http://localhost:8080](http://localhost:8080)
-* Prometheus → [http://localhost:9090](http://localhost:9090)
-* Node Exporter → [http://localhost:9100](http://localhost:9100)
-* Grafana → [http://localhost:3001](http://localhost:3001)
-* Alertmanager → [http://localhost:9093](http://localhost:9093)
-
----
-
-## 📡 إعداد Prometheus
-
-`prometheus/prometheus.yml` يحتوي على إعدادات Scraping وملفات التنبيه.
-
-```
-global:
-  scrape_interval: 15s
-
-rule_files:
-  - "alerting.rules.yml"
-
-scrape_configs:
-  - job_name: 'prometheus'
-    static_configs:
-      - targets: ['localhost:9090']
-
-  - job_name: 'node_exporter'
-    static_configs:
-      - targets: ['node_exporter:9100']
-
-  - job_name: 'backend'
-    static_configs:
-      - targets: ['backend:3000']
-```
-
----
-
-## 🔔 إعداد Alertmanager
-
-`alertmanager/alertmanager.yml` يحتوي على إعداد إرسال التنبيهات.
-
-```
-global:
-  resolve_timeout: 5m
-
-route:
-  receiver: 'team-email'
-
-receivers:
-- name: 'team-email'
-  email_configs:
-  - to: 'you@example.com'
-    from: 'grafana@example.com'
-    smarthost: 'smtp.example.com:587'
-    auth_username: 'smtp_user'
-    auth_password: 'smtp_password'
-```
-
----
-
-## 📊 إعداد Grafana Provisioning
-
-### Datasource
-
-`grafana/provisioning/datasources/datasource.yml`
-
-```
-apiVersion: 1
-datasources:
-  - name: Prometheus
-    type: prometheus
-    url: http://prometheus:9090
-    access: proxy
-    isDefault: true
-```
-
-### Dashboard Provider
-
-`grafana/provisioning/dashboards/dashboard.yml`
-
-```
-apiVersion: 1
-providers:
-  - name: 'default'
-    folder: ''
-    type: file
-    options:
-      path: /etc/grafana/provisioning/dashboards
-```
-
----
-
-## 💾 استخراج Dashboards من Grafana
-
-### من الواجهة GUI
-
-Dashboard → Share → Export → Save to file
-
-### من API
-
-```
-curl -H "Authorization: Bearer API_KEY" http://localhost:3000/api/dashboards/uid/UID
-```
-
----
-
-## 🛡️ GitHub Authentication
-
-GitHub لا يقبل الباسورد → استخدم Personal Access Token أو SSH Key.
-
----
-
-## 📞 تواصل
-
-email: [mohamedassal52003@gmail.com](mailto:mohamedassal52003@gmail.com)
+If you need diagrams (architecture), badges, or want this README exported as PDF — just tell me!
