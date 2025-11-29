@@ -213,11 +213,11 @@ docker run -d --name node_exporter --net=host --pid=host prom/node-exporter:late
 
 ---
 
-## 4️⃣ Start Backend + Frontend + cAdvisor + MongoDB (Docker)
+## 4️⃣ Start Backend + Frontend + MongoDB (Docker)
 
 The application stack runs inside Docker using `docker-compose`.
 
-### Start all containers:
+### Start all application containers:
 
 ```bash
 docker compose up --build -d
@@ -228,10 +228,22 @@ This starts:
 * **Backend** (Node.js URL shortener + custom metrics)
 * **Frontend** (React UI)
 * **MongoDB** (Persistent database)
-* **cAdvisor** (Container performance metrics)
 
-> ⚠️ Ensure that `docker-compose.yml` contains the `cadvisor` and `mongo` services.
-> If you want, I can generate a ready professional docker-compose.yml including volumes.
+> ⚠️ **Note:** cAdvisor is *not* part of the docker-compose stack.
+> You have already downloaded & run cAdvisor as a standalone Docker container outside docker-compose.
+
+If cAdvisor is not running, start it manually:
+
+```bash
+docker run -d \
+  --name=cadvisor \
+  --volume=/:/rootfs:ro \
+  --volume=/var/run:/var/run:rw \
+  --volume=/sys:/sys:ro \
+  --volume=/var/lib/docker/:/var/lib/docker:ro \
+  --publish=8080:8080 \
+  gcr.io/cadvisor/cadvisor:latest
+```
 
 ---
 
