@@ -249,7 +249,5 @@ docker run -d \
 
 📞 Contact
 
-Mohamed El-Sayed
-Email: [mohamedassal52003@gmail.com](mailto:mohamedassal52003@gmail.com)
 **Mohamed El-Sayed**
 Email: **[mohamedassal52003@gmail.com](mailto:mohamedassal52003@gmail.com)**
