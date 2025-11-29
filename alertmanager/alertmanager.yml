@@ -1,0 +1,34 @@
+global:
+  smtp_smarthost: '********'
+  smtp_from: '********'
+  smtp_auth_username: '********'
+  smtp_auth_password: '********'
+  smtp_require_tls: true
+  resolve_timeout: 5m
+
+route:
+  receiver: 'all-receivers'     
+  group_by: ['alertname']
+  group_wait: 5s
+  group_interval: 30s
+  repeat_interval: 3h
+
+receivers:
+  - name: 'all-receivers'
+    slack_configs:
+      - api_url: '********'
+        channel: '#alerts'
+        username: 'PrometheusBot'
+        send_resolved: true
+    email_configs:
+      - to: '********'
+        send_resolved: true
+    telegram_configs:
+      - bot_token: '********'
+        chat_id: ********
+        message: |
+          [{{ .Status | toUpper }}] Alert Notification
+          *Alert:* {{ .CommonAnnotations.summary }}
+          *Description:* {{ .CommonAnnotations.description }}
+          *Severity:* {{ .CommonLabels.severity }}
+        send_resolved: true
