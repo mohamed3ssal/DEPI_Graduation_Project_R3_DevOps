@@ -79,7 +79,7 @@ DEPI_Graduation_Project_R3_DevOps/
 
   * backend (container)
   * frontend (container)
-  * cAdvisor (container)
+  * Mongo DB (container)
 
 ## 📦 Deliverables
 
