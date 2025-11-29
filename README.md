@@ -157,9 +157,8 @@ Prometheus runs directly on the host and scrapes:
   * Mongo DB stored on host
   * Prometheus data stored under `/var/lib/prometheus`
   * Grafana data stored under `/var/lib/grafana`
-* Performed complete restart tests:
+---
 
-  
 
 # 🚀 Running the Entire Stack
 
