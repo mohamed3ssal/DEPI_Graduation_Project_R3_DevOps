@@ -154,67 +154,12 @@ Prometheus runs directly on the host and scrapes:
   * Backend down alerts
 * Enabled persistent storage:
 
-  * SQLite DB stored on host
+  * Mongo DB stored on host
   * Prometheus data stored under `/var/lib/prometheus`
   * Grafana data stored under `/var/lib/grafana`
 * Performed complete restart tests:
 
-  ```bash
-  docker compose down
-  docker compose up -d
-  systemctl restart prometheus
-  ```
-
-e systemctl restart grafana-server
-
-````
-- Verified data persisted successfully
-- Completed full documentation (API + system overview)
-
-## 📦 Deliverables
-✔ Alerting configured  
-✔ Persistence enabled for all stateful services  
-✔ Stable monitoring stack after restart  
-✔ Completed and professional documentation
-
----
-
-# 📘 API Documentation
-## POST /shorten
-Creates a shortened URL.
-
-**Request Body:**
-```json
-{
-"url": "https://example.com"
-}
-````
-
-**Response:**
-
-```json
-{
-  "shortCode": "abc123"
-}
-```
-
----
-
-## GET /:code
-
-Redirects user to the original long URL.
-
-**Responses:**
-
-* HTTP **302 Redirect**, or:
-
-```json
-{
-  "error": "Not Found"
-}
-```
-
----
+  
 
 # 🚀 Running the Entire Stack
 
