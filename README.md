@@ -161,37 +161,83 @@ Prometheus runs directly on the host and scrapes:
 
   
 
-🚀 Running the Entire Stack
-1️⃣ Start Prometheus (Host)
+# 🚀 Running the Entire Stack
+
+## 1️⃣ Start Prometheus (Host)
+
+Prometheus runs on the host machine to scrape backend, node exporter, and cAdvisor metrics.
+
+```bash
 sudo systemctl start prometheus
+```
 
-Or (run directly):
+Or run manually:
 
+```bash
 prometheus --config.file=/etc/prometheus/prometheus.yml
-2️⃣ Start Grafana (Host)
+```
+
+---
+
+## 2️⃣ Start Grafana (Host)
+
+Grafana runs as a systemd service on the host.
+
+```bash
 sudo systemctl start grafana-server
-3️⃣ Start Node Exporter (Host)
+```
 
-Node Exporter runs on the host to expose host-level metrics to Prometheus.
+Access Grafana locally on:
 
-As a systemd service (recommended):
+```
+http://<host-ip>:3000
+```
 
+---
+
+## 3️⃣ Start Node Exporter (Host)
+
+Node Exporter exposes host machine metrics directly to Prometheus.
+
+### As a systemd service (recommended):
+
+```bash
 sudo systemctl start node_exporter
+```
 
-Or as a container (host network):
+### OR run it as a container with host networking:
 
+```bash
 docker run -d --name node_exporter --net=host --pid=host prom/node-exporter:latest
-4️⃣ Start Backend + Frontend + cAdvisor + MongoDB (Docker)
+```
 
-Note: you previously pulled the cAdvisor image but did not enable/start it in docker-compose.yml. If you want cAdvisor to run, make sure the cadvisor service is present and not commented out in docker-compose.yml.
+---
 
-Start the application stack (backend, frontend, and optional services defined in docker-compose.yml):
+## 4️⃣ Start Backend + Frontend + cAdvisor + MongoDB (Docker)
 
+The application stack runs inside Docker using `docker-compose`.
+
+### Start all containers:
+
+```bash
 docker compose up --build -d
+```
 
-If you want to include cAdvisor and MongoDB in the docker-compose stack, add services for them in docker-compose.yml (Mongo should include a persistent volume for the DB file). If you like, I can add a ready-to-use docker-compose.yml snippet that includes backend, frontend, cadvisor, and mongo with volumes—tell me and I will paste it into the README or directly into your repo.
+This starts:
+
+* **Backend** (Node.js URL shortener + custom metrics)
+* **Frontend** (React UI)
+* **MongoDB** (Persistent database)
+* **cAdvisor** (Container performance metrics)
+
+> ⚠️ Ensure that `docker-compose.yml` contains the `cadvisor` and `mongo` services.
+> If you want, I can generate a ready professional docker-compose.yml including volumes.
+
+---
 
 📞 Contact
 
 Mohamed El-Sayed
-Email: mohamedassal52003@gmail.com
+Email: [mohamedassal52003@gmail.com](mailto:mohamedassal52003@gmail.com)
+**Mohamed El-Sayed**
+Email: **[mohamedassal52003@gmail.com](mailto:mohamedassal52003@gmail.com)**
