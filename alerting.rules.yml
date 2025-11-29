@@ -1,0 +1,68 @@
+groups:
+  - name: container_alerts
+    rules:
+      - alert: BackendContainerDown
+        expr: time() - container_last_seen{name="urlshortener-backend"} > 15
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backend container is DOWN"
+          description: "The URL shortener backend container (urlshortener-backend) has not reported metrics for more than 15 second."
+
+      - alert: FrontendContainerDown
+        expr: time() - container_last_seen{name="urlshortener-frontend"} > 15
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Frontend container is DOWN"
+          description: "The URL shortener frontend container (urlshortener-frontend) has not reported metrics for more than 30 second."
+
+      - alert: MongoContainerDown
+        expr: time() - container_last_seen{name="urlshortener-mongo"} > 15
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "MongoDB container is DOWN"
+          description: "The MongoDB container (urlshortener-mongo) has not reported metrics for more than 30 second."
+
+      - alert: ContainerHighMemory
+        expr: container_memory_usage_bytes{name=~"urlshortener-.*"} > 300 * 1024 * 1024
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage in container {{ $labels.name }}"
+          description: "Container {{ $labels.name }} is using more than 300MB RAM for more than 1 minute."
+
+      - alert: ContainerHighCPU
+        expr: rate(container_cpu_usage_seconds_total{name=~"urlshortener-.*"}[3m]) > 0.8
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage in container {{ $labels.name }}"
+          description: "Container {{ $labels.name }} CPU usage is higher than 80% for the last 5 minutes."
+
+
+  - name: host_alerts
+    rules:
+      - alert: HighHostCPU
+        expr: 100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[3m])) * 100) > 80
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage on host"
+          description: "Host CPU usage is above 80% for more than 3 minutes."
+
+      - alert: HighHostMemory
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 80
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage on host"
+          description: "Host memory usage is above 80%."
