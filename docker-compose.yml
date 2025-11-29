@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:7
+    container_name: urlshortener-mongo
+    restart: unless-stopped
+    networks:
+      - urlshortener-net
+    volumes:
+      - mongo_data:/data/db
+
+  backend:
+    build: ./backend
+    container_name: urlshortener-backend
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    networks:
+      - urlshortener-net
+    ports:
+      - "7000:7000"
+    environment:
+      - DATABASE_URL=mongodb://mongo:27017/urlshortener
+      - HOST=http://192.168.1.166
+      - PORT=7000
+
+  frontend:
+    build: ./frontend
+    container_name: urlshortener-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - urlshortener-net
+    ports:
+      - "8081:80"
+    environment:
+      - BACK_HOST=192.168.1.166
+
+networks:
+  urlshortener-net:
+
+volumes:
+  mongo_data:
+
